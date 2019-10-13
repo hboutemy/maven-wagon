@@ -63,20 +63,20 @@ public class HttpMessageUtils
     public static String formatTransferDebugMessage( String url, int statusCode, String reasonPhrase,
                                                      ProxyInfo proxyInfo )
     {
-        String msg = url;
+        StringBuilder msg = new StringBuilder( url );
         if ( statusCode != UNKNOWN_STATUS_CODE )
         {
-            msg += " -- status code: " + statusCode;
+            msg.append( " -- status code: " ).append( statusCode );
             if ( StringUtils.isNotEmpty( reasonPhrase ) )
             {
-                msg += ", reason phrase: " + reasonPhrase;
+                msg.append( ", reason phrase: " ).append( reasonPhrase );
             }
         }
         if ( proxyInfo != null )
         {
-            msg += " -- " + proxyInfo.toString();
+            msg.append( " -- " ).append( proxyInfo.toString() );
         }
-        return msg;
+        return msg.toString();
     }
 
     /**
@@ -108,22 +108,7 @@ public class HttpMessageUtils
     public static String formatTransferFailedMessage( String url, int statusCode, String reasonPhrase,
                                                       ProxyInfo proxyInfo )
     {
-        String msg = "Transfer failed for " + url;
-        if ( statusCode != UNKNOWN_STATUS_CODE )
-        {
-            msg += " " + statusCode;
-            // deliberately a null check instead of empty check so that we avoid having to handle
-            // all conceivable default status code messages
-            if ( reasonPhrase != null )
-            {
-                msg += " " + reasonPhrase;
-            }
-        }
-        if ( proxyInfo != null )
-        {
-            msg += " " + proxyInfo.toString();
-        }
-        return msg;
+        return formatMessage( "Transfer failed for ", url, statusCode, reasonPhrase, proxyInfo );
     }
 
     /**
@@ -158,21 +143,8 @@ public class HttpMessageUtils
             default:
                 break;
         }
-        String msg = "Authorization failed for " + url;
-        if ( statusCode != UNKNOWN_STATUS_CODE )
-        {
-            msg += " " + statusCode;
-            if ( StringUtils.isNotEmpty( reasonPhrase ) )
-            {
-                msg += " " + reasonPhrase;
-            }
-        }
-        if ( proxyInfo != null )
-        {
-            msg += " " + proxyInfo.toString();
-        }
-        return msg;
 
+        return formatMessage( "Authorization failed for ", url, statusCode, reasonPhrase, proxyInfo );
     }
 
     /**
@@ -190,33 +162,38 @@ public class HttpMessageUtils
     public static String formatResourceDoesNotExistMessage( String url, int statusCode, String reasonPhrase,
                                                             ProxyInfo proxyInfo )
     {
-        String msg = "Resource missing at " + url;
+        return formatMessage( "Resource missing at ", url, statusCode, reasonPhrase, proxyInfo );
+    }
+
+    private static String formatMessage( String message, String url, int statusCode, String reasonPhrase,
+                                         ProxyInfo proxyInfo )
+    {
+        StringBuilder msg = new StringBuilder( message ).append( url );
 
         if ( statusCode != UNKNOWN_STATUS_CODE )
         {
-            msg += " " + statusCode;
+            msg.append( " " ).append( statusCode );
 
             if ( StringUtils.isNotEmpty( reasonPhrase ) )
             {
-                msg += " " + reasonPhrase;
+                msg.append( " " ).append( reasonPhrase );
             }
             else
             {
                 if ( statusCode == SC_NOT_FOUND )
                 {
-                    msg += " Not Found";
+                    msg.append( " Not Found" );
                 }
                 else if ( statusCode == SC_GONE )
                 {
-                    msg += " Gone";
+                    msg.append( " Gone" );
                 }
             }
         }
         if ( proxyInfo != null )
         {
-            msg += " " + proxyInfo.toString();
+            msg.append( " " ).append( proxyInfo.toString() );
         }
-        return msg;
+        return msg.toString();
     }
-
 }
